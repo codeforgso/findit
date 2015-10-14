@@ -1,5 +1,6 @@
-import React from 'react';
-import request from 'superagent';
+import React from 'react'
+import Navbar from './components/Navbar'
+import request from 'superagent'
 
 require('./less/bootstrap.less');
 
@@ -28,18 +29,21 @@ class Root extends React.Component {
 
   render() {
     return (
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-md-3">
-            <ul>
-              {this.state.facilities.map((facility) => <li>{facility.name}</li>)}
-            </ul>
-          </div>
-          <div className="col-md-3">
-            <h1>Hello, world!</h1>
-          </div>
-          <div className="col-md-6">
-            <h1>Hello, world!</h1>
+      <div>
+        <Navbar />
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col-md-3">
+              <ul>
+                {this.state.facilities.map((facility) => <li>{facility.name}</li>)}
+              </ul>
+            </div>
+            <div className="col-md-3">
+              <h1>Hello, world!</h1>
+            </div>
+            <div className="col-md-6">
+              <h1>Hello, world!</h1>
+            </div>
           </div>
         </div>
       </div>
