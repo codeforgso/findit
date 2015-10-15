@@ -2,6 +2,8 @@ import React from 'react'
 import Navbar from './components/Navbar'
 import request from 'superagent'
 
+import {Input} from 'react-bootstrap'
+
 require('./less/bootstrap.less');
 
 let getFacilityTypes = function(callback) {
@@ -9,13 +11,40 @@ let getFacilityTypes = function(callback) {
 
   request.get(url).end((error, result) => {
     if (result.ok) {
-      callback(result.body.facet_groups[0].facets);
+      callback(result.body.facet_groups[0].facets || []);
     }
     else {
       alert('Oh noes! ' + error.message);
     }
   });
 };
+
+class FacetColumns extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {checkedFacet: null};
+  }
+
+  render() {
+
+
+    return (
+        <ul className="list-unstyled">
+          {this.props.facilities
+              .filter((facility) =>
+                  (this.state.checkedFacet == null || this.state.checkedFacet == facility.name))
+              .map((facility) =>
+                  <li key = {facility.name}>
+                    <Input type="checkbox"
+                             label={facility.name}
+                             checked={this.state.checkedFacet == facility.name}
+                             onChange={() => this.setState({checkedFacet: (this.state.checkedFacet == null ? facility.name : null)})} />
+                  </li>)}
+        </ul>
+    );
+  }
+}
+
 
 class Root extends React.Component {
   constructor(props) {
@@ -34,9 +63,7 @@ class Root extends React.Component {
         <div className="container-fluid">
           <div className="row">
             <div className="col-md-3">
-              <ul>
-                {this.state.facilities.map((facility) => <li>{facility.name}</li>)}
-              </ul>
+              <FacetColumns facilities={this.state.facilities} />
             </div>
             <div className="col-md-3">
               <h1>Hello, world!</h1>
