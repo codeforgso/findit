@@ -1,7 +1,7 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import Navbar from './components/Navbar'
 import request from 'superagent'
-
 import {Input} from 'react-bootstrap'
 
 require('./less/bootstrap.less');
@@ -47,6 +47,25 @@ let getAllLocations = function(callback) {
   });
 };
 
+class Map extends React.Component {
+  componentDidMount() {
+    this.leaflet = L.map('map').setView([51.505, -0.09], 13);
+
+    L.tileLayer('http://a{s}.acetate.geoiq.com/tiles/acetate-hillshading/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+        maxZoom: 18,
+        id: 'your.mapbox.project.id',
+        accessToken: 'your.mapbox.public.access.token'
+    }).addTo(this.leaflet);
+  }
+
+  render() {
+    return (
+      <div id="map" style={{height:'100%'}}></div>
+    );
+  }
+}
+
 // Controls the far left column
 // Used to select a facet or facility type
 class FacetColumns extends React.Component {
@@ -59,7 +78,6 @@ class FacetColumns extends React.Component {
     console.log("update called: " + selectedFacet);
     this.setState({checkedFacet: selectedFacet});
     this.props.onChange(selectedFacet);
-
   }
 
   render() {
@@ -81,7 +99,6 @@ class FacetColumns extends React.Component {
   }
 }
 
-
 class LocationsColumn extends React.Component {
     constructor(props) {
     super(props);
@@ -102,7 +119,6 @@ class LocationsColumn extends React.Component {
   }
 }
 
-
 class Root extends React.Component {
   constructor(props) {
     super(props);
@@ -118,23 +134,24 @@ class Root extends React.Component {
 
   render() {
     return (
-      <div>
+      <div style={{position:'fixed',width:'100%',height:'100%',top:0,left:0}}>
         <Navbar />
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col-md-3">
-                <h3>Property Type</h3>
+        <div className="container-fluid" style={{height:'100%'}}>
+          <div className="row" style={{height:'100%'}}>
+            <div className="col-md-3" style={{borderRight:'1px solid #afafaf',height:'100%'}}>
+              <h4 className="quiet">Property Type</h4>
               <FacetColumns facilities={this.state.facilities}
                             onChange={(facet) => this.setState({selectedFacet:facet})}/>
             </div>
-            <div className="col-md-3">
-
+            <div className="col-md-3" style={{borderRight:'1px solid #afafaf',height:'100%'}}>
               <LocationsColumn locations={this.state.locations}
                                selectedLocation={this.state.selectedLocation}
                                onChange={getFacilityLocations(this.state.selectedFacet, (locs) => this.setState({locations:locs}))} />
             </div>
-            <div className="col-md-6">
-              <h1>Hello, world!</h1>
+            <div className="col-md-6" style={{borderRight:'1px solid #afafaf',height:'100%'}}>
+              <div style={{height:'100%'}}>
+                <Map />
+              </div>
             </div>
           </div>
         </div>
@@ -143,4 +160,4 @@ class Root extends React.Component {
   }
 }
 
-React.render(<Root />, document.getElementById('content'));
+ReactDOM.render(<Root />, document.getElementById('content'));
