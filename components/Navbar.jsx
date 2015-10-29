@@ -1,5 +1,16 @@
 import React from 'react'
-import {Navbar, NavBrand, Nav, NavItem, NavDropdown, MenuItem, Modal, Button, OverlayTrigger} from 'react-bootstrap'
+import
+  { Navbar,
+    NavBrand,
+    Nav,
+    NavItem,
+    NavDropdown,
+    CollapsibleNav,
+    MenuItem,
+    Modal,
+    Button,
+    OverlayTrigger }
+  from 'react-bootstrap'
 
 let Logo = require('../images/logo.png');
 let BuiltInLogo = require('../images/gsobuilt.jpg');
@@ -12,7 +23,7 @@ class About extends React.Component {
 
   render() {
     return (
-      <Nav pullRight={true} {...this.props}>
+      <Nav navbar right {...this.props}>
         <NavItem eventKey={1} href="#" onClick={(e) => this.setState({showModal:true})}>About</NavItem>
 
         <Modal show={this.state.showModal} onHide={() => this.setState({showModal:false})}>
@@ -52,11 +63,17 @@ class About extends React.Component {
 export default class extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {query:''}
+  }
+
+  search(e, query) {
+    e.preventDefault();
+    // ?
   }
 
   render() {
     return (
-      <Navbar staticTop={true} fluid={true}>
+      <Navbar toggleNavKey={0} fluid staticTop>
         <NavBrand>
           <div style={{marginTop:-6}}>
             <a href="/">
@@ -66,17 +83,24 @@ export default class extends React.Component {
             </a>
           </div>
         </NavBrand>
-        <Nav>
-          <form className="navbar-form navbar-left" role="search">
-            <div className="form-group">
-              <input type="text" className="form-control" placeholder="Search" />
-            </div>
-            {' '}
-            <button type="submit" className="btn btn-primary">Submit</button>
-          </form>
-        </Nav>
-
-        <About />
+        <CollapsibleNav eventKey={0}>
+          <Nav navbar>
+            <form className="navbar-form navbar-left"
+                  role="search"
+                  onSubmit={(e) => this.search(e, this.state.query)}>
+              <div className="form-group">
+                <input type="text"
+                       className="form-control"
+                       placeholder="Search"
+                       value={this.state.query}
+                       onChange={(e) => this.setState({query:e.target.value})} />
+              </div>
+              {' '}
+              <button type="submit" className="btn btn-primary">Submit</button>
+            </form>
+          </Nav>
+          <About />
+        </CollapsibleNav>
       </Navbar>
     );
   }
