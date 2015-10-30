@@ -11,6 +11,7 @@ import
     Button,
     OverlayTrigger }
   from 'react-bootstrap'
+import {searchLocations} from '../api'
 
 let Logo = require('../images/logo.png');
 let BuiltInLogo = require('../images/gsobuilt.jpg');
@@ -63,12 +64,22 @@ class About extends React.Component {
 export default class extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {query:''}
+    this.state = {
+      query: ''
+    }
   }
 
-  search(e, query) {
-    e.preventDefault();
-    // ?
+  onSearchSubmit(e) {
+      e.preventDefault(e)
+      //this.setState({locations: searchLocations(query)});
+      searchLocations(this.state.query, (locs) => this.props.onChange(locs));
+  }
+
+  componentWillReceiveProps(nextProps, nextState){
+    console.log('test');
+    if (nextProps.selectedFacility !== this.props.selectedFacility) {
+      this.setState({query: ''});
+    }
   }
 
   render() {
@@ -87,16 +98,16 @@ export default class extends React.Component {
           <Nav navbar>
             <form className="navbar-form navbar-left"
                   role="search"
-                  onSubmit={(e) => this.search(e, this.state.query)}>
+                  onSubmit={(e) => this.onSearchSubmit(e)}>
               <div className="form-group">
                 <input type="text"
                        className="form-control"
                        placeholder="Search"
                        value={this.state.query}
-                       onChange={(e) => this.setState({query:e.target.value})} />
+                       onChange={(e) => this.setState({query: e.target.value})} />
               </div>
               {' '}
-              <button type="submit" className="btn btn-primary">Submit</button>
+              <input type="submit" className="btn btn-primary"></input>
             </form>
           </Nav>
           <About />

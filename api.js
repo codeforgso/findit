@@ -1,3 +1,4 @@
+
 import request from 'superagent'
 
 export let getFacilityTypes = function(callback) {
@@ -40,3 +41,18 @@ export let getAllLocations = function(callback) {
     }
   });
 };
+
+
+export let searchLocations = function(query, callback) {
+    let url = "https://codeforgreensboro.opendatasoft.com/api/records/1.0/search/?dataset=cityfacilities&rows=247&q=" + query.split(' ').join('+');
+
+    request.get(url).end((error, result) => {
+    if (result.ok) {
+      callback(result.body.records || []);
+    }
+    else {
+      alert('Oh noes! ' + error.message);
+    }
+  });
+};
+

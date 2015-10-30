@@ -2,13 +2,14 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Navbar from './components/Navbar'
 import {Input} from 'react-bootstrap'
-import {getFacilityTypes, getAllLocations, getFacilityLocations} from './api'
+import {getAllLocations, getFacilityLocations, getFacilityTypes, searchLocations} from './api'
+
 
 require('./less/bootstrap.less');
 
 class Map extends React.Component {
   componentDidMount() {
-    this.leaflet = L.map('map').setView([51.505, -0.09], 13);
+    this.leaflet = L.map('map').setView([36.082977, -79.828582], 13);
 
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
@@ -66,6 +67,23 @@ class LocationsColumn extends React.Component {
     getAllLocations((locs) => this.setState({locations:locs}));
   }
 
+    componentWillReceiveProps (nextProps){
+        // prevent changing locations list if a location is clicked
+        if (nextProps.selectedLocation != this.props.selectedLocation){return}
+
+        // update locations based on search and facet choice
+        if (nextProps.selectedFacility == null && this.props.selectedFacility != null) {
+            // a facet was unselected
+             getAllLocations((locs) => this.setState({locations: locs}));
+        } else if (nextProps.selectedFacility != this.props.selectedFacility) {
+            // new facet selected
+            getFacilityLocations(nextProps.selectedFacility, (locs) => this.setState({locations: locs}));
+        } else {
+            // selectedFacility didn't change so must be search
+            this.setState({locations: nextProps.locations});
+        }
+    }
+
   render() {
     return (
       <div className="list-group">
@@ -98,15 +116,23 @@ class Root extends React.Component {
     this.setState({selectedFacility:facility});
   }
 
-  onSelectLocation(location) {
-    this.setState({selectedLocation:location});
+  onSelectLocation(locations) {
+    this.setState({selectedLocation:locations});
   }
+
+    onSearchSubmit(locs){
+        this.setState({locations: locs});
+    }
+
 
   render() {
     return (
-      <div>
-        <Navbar />
-        <div className="container-fluid" style={{position:'fixed',width:'100%',top:50,left:0,right:0,bottom:0}}>
+
+      <div style={{position:'fixed',width:'100%',height:'100%',top:0,left:0}}>
+        <Navbar
+            selectedFacility={this.state.selectedFacility}
+            onChange={this.onSearchSubmit.bind(this)}/>
+        <div className="container-fluid" style={{height:'100%'}}>
           <div className="row" style={{height:'100%'}}>
             <div className="col-xs-6 col-md-3"
                  style={{borderRight:'1px solid #afafaf',height:'100%'}}>
@@ -118,9 +144,10 @@ class Root extends React.Component {
             <div className="col-xs-6 col-md-3 no-lr-padding"
                  style={{borderRight:'1px solid #afafaf',height:'100%',overflowY:'scroll'}}>
               <LocationsColumn
-                selectedFacility={this.state.selectedFacility}
-                selectedLocation={this.state.selectedLocation}
-                onChange={this.onSelectLocation.bind(this)} />
+                  locations={this.state.locations}
+                  selectedFacility={this.state.selectedFacility}
+                  selectedLocation={this.state.selectedLocation}
+                  onChange={this.onSelectLocation.bind(this)} />
             </div>
             <div className="col-xs-12 col-md-6 no-lr-padding"
                  style={{borderRight:'1px solid #afafaf',height:'100%'}}>
